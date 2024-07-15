@@ -10,7 +10,8 @@ interface PayloadType extends JwtPayload {
 
 const verifyHandler = async (req: NextRequest): Promise<NextResponse> => {
   try {
-    const token: string | null = req.nextUrl.searchParams.get("token");
+    const token: string | null = req.url.split("?")[1].split("=")[1];
+
     if (!token) {
       return NextResponse.json({
         success: false,
@@ -57,7 +58,6 @@ const verifyHandler = async (req: NextRequest): Promise<NextResponse> => {
     return NextResponse.json({
       success: false,
       message: "Error verifying email",
-      error: error instanceof Error ? error.message : error,
     });
   }
 };

@@ -95,7 +95,7 @@ const handler = async (req: NextRequest) => {
 
     return NextResponse.json({
       success: true,
-      message: "Welcome aboard! Your account has been created successfully.",
+      message: "Done! Please check your email to confirm your account.",
     });
   } catch (error) {
     return NextResponse.json({

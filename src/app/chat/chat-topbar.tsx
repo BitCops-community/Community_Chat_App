@@ -3,7 +3,7 @@ import { Avatar, AvatarImage } from '../../components/ui/avatar'
 import UsersCount from '@/components/UsersCount'
 
 import { ModeToggle } from '@/components/theme-changer'
-import Logout from '@/components/Logout'
+
 
 export default function ChatTopbar() {
   return (
@@ -25,7 +25,7 @@ export default function ChatTopbar() {
       </div>
 
       <ModeToggle />
-      <Logout />
+
     </div>
   )
 }

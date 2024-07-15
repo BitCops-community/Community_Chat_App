@@ -58,6 +58,7 @@ const verifyHandler = async (req: NextRequest): Promise<NextResponse> => {
     return NextResponse.json({
       success: false,
       message: "Error verifying email",
+      error: error instanceof Error ? error.message : error,
     });
   }
 };

@@ -52,6 +52,16 @@ function formatTimestampToHumanReadable(timestamp: string | number | undefined):
 }
 
 
+const replaceUrlsWithLinks = (text: string) => {
+  const urlRegex = /((https?:\/\/)?(\w+(\.\w+)+)(\/[\w#&?=%.+-]*)?)/g;
+  return text.replace(urlRegex, (url) => {
+    let hyperlink = url;
+    if (!hyperlink.startsWith("http")) {
+      hyperlink = "http://" + hyperlink;
+    }
+    return `<a href="${hyperlink}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${url}</a>`;
+  });
+};
 
 export function ChatList({
   messages,
@@ -140,7 +150,11 @@ export function ChatList({
                 <span className="bg-accent p-3 rounded-md max-w-xs">
                   <small>{message.name}</small>
                   <br />
-                  {message.message}
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: replaceUrlsWithLinks(message.message),
+                    }}
+                  />
                   <br />
                   <small>{formatTimestampToHumanReadable(message.createdAt)}</small>
                 </span>

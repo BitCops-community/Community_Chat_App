@@ -30,7 +30,11 @@ const handler = async (req: NextRequest) => {
 
     // Check if credentials are valid
 
-    let user = await User.findOne({ email: login });
+    let user = await User.findOne({ email: login.toLowerCase() });
+
+    if (!user) {
+      await User.findOne({ username: login });
+    }
 
     if (!user)
       return NextResponse.json({

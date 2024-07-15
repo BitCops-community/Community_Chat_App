@@ -52,7 +52,7 @@ const verifyHandler = async (req: NextRequest): Promise<NextResponse> => {
 
     return NextResponse.json({
       success: true,
-      message: "Email verified successfully",
+      message: "Email verified successfully! Please Continue To Login",
     });
   } catch (error) {
     return NextResponse.json({

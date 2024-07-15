@@ -22,7 +22,7 @@ export function Chat({ messages, selectedUser, sendMessage }: ChatProps) {
         selectedUser={selectedUser}
         sendMessage={sendMessage}
       />
-      <div style={{ textAlign: 'center', paddingTop: '5px', borderTop: '1px solid #ddd' }}>
+      <div className="flex items-center justify-around" style={{ textAlign: 'center', paddingTop: '5px', borderTop: '1px solid #ddd' }}>
         <p className="mb-0">
           Created by <a href="https://github.com/fhackker" target="_blank" rel="noopener noreferrer" style={{ color: '#007bff', textDecoration: 'none' }}>Faisal Shahzad (Fhackker)</a>
         </p>

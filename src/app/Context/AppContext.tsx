@@ -73,7 +73,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
     };
 
     useEffect(() => {
-        const url = process.env.NODE_ENV === 'production' ? 'http://localhost:3001' : 'http://localhost:3002';
+        const url = process.env.NODE_ENV === 'production' ? 'https://community-chat-app-backend.onrender.com' : 'http://localhost:3002';
         const socket = io(url);
 
         // Listeners

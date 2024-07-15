@@ -49,7 +49,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = useState<string | null>(null);
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [socket, setSocket] = useState<Socket | null>(null);
-    const [liveUsers, setLiveUsers] = useState<number>(0)
+    const [liveUsers, setLiveUsers] = useState<number>(1)
     const sendMessage = (message: MessageType) => {
         setMessages((prev) => [...prev, message]);
 

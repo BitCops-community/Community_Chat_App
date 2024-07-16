@@ -1,10 +1,10 @@
-
 import { cn } from "@/lib/utils";
 import React, { useEffect, useRef } from "react";
 import { Avatar, AvatarImage } from "../../components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { MessageType, useAppContext, UserType } from "@/app/Context/AppContext";
+import { AutoSizer, List } from "react-virtualized";
 
 interface ChatListProps {
   messages?: MessageType[];
@@ -52,16 +52,6 @@ function formatTimestampToHumanReadable(timestamp: string | number | undefined):
 }
 
 
-const replaceUrlsWithLinks = (text: string) => {
-  const urlRegex = /((https?:\/\/)?(\w+(\.\w+)+)(\/[\w#&?=%.+-]*)?)/g;
-  return text.replace(urlRegex, (url) => {
-    let hyperlink = url;
-    if (!hyperlink.startsWith("http")) {
-      hyperlink = "http://" + hyperlink;
-    }
-    return `<a href="${hyperlink}" target="_blank" rel="noopener noreferrer" class="text-blue-500 underline">${url}</a>`;
-  });
-};
 
 export function ChatList({
   messages,
@@ -69,7 +59,18 @@ export function ChatList({
   sendMessage
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const { token, loggedIn, setMessages } = useAppContext();
+  const { token, loggedIn, setMessages, messageHeights, setMessageHeights, replaceUrlsWithLinks } = useAppContext();
+
+
+  const listRef = useRef<List>(null); // Ref to the List component
+  React.useEffect(() => {
+    if (listRef.current) {
+      // Scroll to the bottom when messages change
+      listRef.current.scrollToRow(messages?.length! - 1)
+    }
+  }, [messages]);
+
+
   React.useEffect(() => {
     if (messagesContainerRef.current) {
       messagesContainerRef.current.scrollTop =
@@ -87,93 +88,154 @@ export function ChatList({
       body: JSON.stringify({
         recipientId: selectedUser.id
       })
-    })
+    });
 
     const res: { success: boolean; messages: MessageType[] } = await req.json();
-    return res
-  }
+    return res;
+  };
 
   useEffect(() => {
     if (token && loggedIn) {
       getMessages().then((res: { success: boolean; messages: MessageType[] }) => {
-        console.log(res);
-
         if (res.success) {
-          setMessages(res.messages)
+          setMessages(res.messages);
         }
-      })
+      });
     }
   }, []);
 
-  return (
-    <div className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col">
-      <div
-        ref={messagesContainerRef}
-        className="w-full overflow-y-auto overflow-x-hidden h-full flex flex-col"
-      >
-        <AnimatePresence>
-          {messages?.map((message, index) => (
-            <motion.div
-              key={index}
-              layout
-              initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
-              animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
-              exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
-              transition={{
-                opacity: { duration: 0.1 },
-                layout: {
-                  type: "spring",
-                  bounce: 0.3,
-                  duration: messages.indexOf(message) * 0.05 + 0.2,
-                },
-              }}
-              style={{
-                originX: 0.5,
-                originY: 0.5,
-              }}
-              className={cn(
-                "flex flex-col gap-2 p-4 whitespace-pre-wrap",
-                message.senderId === selectedUser.id ? "items-end" : "items-start"
-              )}
-            >
-              <div className="flex gap-3 items-center">
-                {message.senderId !== selectedUser.id && (
-                  <Avatar className="flex justify-center items-center">
-                    <AvatarImage
-                      src={message.avatar}
-                      alt={message.name}
-                      width={6}
-                      height={6}
-                    />
-                  </Avatar>
-                )}
-                <span className="bg-accent p-3 rounded-md max-w-xs">
-                  <small>{message.name}</small>
-                  <br />
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: replaceUrlsWithLinks(message.message),
-                    }}
-                  />
-                  <br />
-                  <small>{formatTimestampToHumanReadable(message.createdAt)}</small>
-                </span>
+  const calculateMessageHeights = (messages: MessageType[]) => {
+    const heights: number[] = [];
 
-                {message.senderId === selectedUser.id && (
-                  <Avatar className="flex justify-center items-center">
-                    <AvatarImage
-                      src={message.avatar}
-                      alt={message.name}
-                      width={6}
-                      height={6}
-                    />
-                  </Avatar>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
-      </div>
+    messages.forEach((message) => {
+      // Create a temporary div to measure message height
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = `
+        <div class="flex gap-3 items-center">
+          ${message.senderId !== selectedUser.id ? `
+            <div class="flex justify-center items-center">
+              <img src="${message.avatar}" alt="${message.name}" width="6" height="6" />
+            </div>
+          ` : ''}
+          <span class="bg-accent p-3 rounded-md max-w-xs">
+            <small>${message.name}</small><br />
+            ${replaceUrlsWithLinks(message.message)}<br />
+            <small>${formatTimestampToHumanReadable(message.createdAt)}</small>
+          </span>
+          ${message.senderId === selectedUser.id ? `
+            <div class="flex justify-center items-center">
+              <img src="${message.avatar}" alt="${message.name}" width="6" height="6" />
+            </div>
+          ` : ''}
+        </div>
+      `;
+
+      document.body.appendChild(tempDiv);
+      // Get the height and store it
+      const height = tempDiv.offsetHeight;
+      heights.push(height);
+      // Remove the temporary div
+      document.body.removeChild(tempDiv);
+    });
+
+    return heights;
+  };
+
+  useEffect(() => {
+    if (messages) {
+      const heights = calculateMessageHeights(messages);
+
+
+      setMessageHeights(heights);
+    }
+  }, [messages]);
+
+  const rowRenderer = ({ index, key, style }: any) => {
+    const message = messages![index];
+
+    return (
+      <motion.div
+        key={key}
+        layout
+        initial={{ opacity: 0, scale: 1, y: 50, x: 0 }}
+        animate={{ opacity: 1, scale: 1, y: 0, x: 0 }}
+        exit={{ opacity: 0, scale: 1, y: 1, x: 0 }}
+        transition={{
+          opacity: { duration: 0.1 },
+          layout: {
+            type: "spring",
+            bounce: 0.3,
+            duration: 1.1,
+          },
+        }}
+        style={{
+          ...style,
+          originX: 0.5,
+          originY: 0.5,
+        }}
+        className={cn(
+          "flex flex-col gap-2 p-4 whitespace-pre-wrap",
+          message.senderId === selectedUser.id ? "items-end" : "items-start"
+        )}
+
+      >
+        <div className="flex gap-3 items-center">
+          {message.senderId !== selectedUser.id && (
+            <Avatar className="flex justify-center items-center">
+              <AvatarImage
+                src={message.avatar}
+                alt={message.name}
+                width={6}
+                height={6}
+              />
+            </Avatar>
+          )}
+          <span className="bg-accent p-3 rounded-md max-w-xs" style={{ overflowWrap: "anywhere" }}>
+            <small>{message.name}</small>
+            <br />
+            <span
+              dangerouslySetInnerHTML={{
+                __html: replaceUrlsWithLinks(message.message),
+              }}
+            />
+            <br />
+            <small>{formatTimestampToHumanReadable(message.createdAt)}</small>
+          </span>
+
+          {message.senderId === selectedUser.id && (
+            <Avatar className="flex justify-center items-center">
+              <AvatarImage
+                src={message.avatar}
+                alt={message.name}
+                width={6}
+                height={6}
+              />
+            </Avatar>
+          )}
+        </div>
+      </motion.div>
+    );
+  };
+
+  if (messageHeights.length === 0) {
+    return null;
+  }
+
+  return (
+    <div ref={messagesContainerRef} className="w-full top-header overflow-y-auto overflow-x-hidden h-full flex flex-col">
+      <AutoSizer disableHeight>
+        {({ width }) => (
+          <List
+            ref={listRef}
+            width={width}
+            height={(messagesContainerRef.current?.clientHeight! - 52) || 700} // Adjust the height as needed
+            rowCount={messages!.length}
+            rowHeight={({ index }) => messageHeights[index]}
+            rowRenderer={rowRenderer}
+            style={{ outline: "none" }}
+          />
+        )}
+      </AutoSizer>
       <ChatBottombar sendMessage={sendMessage} />
     </div>
   );

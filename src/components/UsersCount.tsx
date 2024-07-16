@@ -6,7 +6,7 @@ export default function UsersCount() {
     const { liveUsers } = useAppContext()
     return (
         <div>
-            <span className="text-xs">{liveUsers} Active Users</span>
+            <span className="text-xs">{liveUsers} Active {liveUsers > 1 ? "Users" : "User"}</span>
         </div>
     )
 }

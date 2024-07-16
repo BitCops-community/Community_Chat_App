@@ -3,6 +3,7 @@ import { useAppContext } from '@/app/Context/AppContext';
 import { LogOut } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React from 'react'
+import { Button } from './ui/button';
 
 export default function Logout() {
     const router = useRouter();
@@ -28,7 +29,10 @@ export default function Logout() {
 
     return (
         <div>
-            <LogOut className='cursor-pointer' size={20} onClick={logout} />
+            <Button variant="outline" size="icon">
+
+                <LogOut className='cursor-pointer' size={20} onClick={logout} />
+            </Button>
         </div>
     )
 }

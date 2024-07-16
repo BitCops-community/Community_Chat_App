@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label"
 import { Cog } from 'lucide-react'
 import Logout from './Logout'
 import { ModeToggle } from './theme-changer'
+import ToggleSounmd from './ToggleSounmd'
 export default function Settings() {
     return (
         <div>
@@ -31,6 +32,12 @@ export default function Settings() {
                                 <Label htmlFor="ChangeTheme">Change Theme</Label>
                                 <ModeToggle />
                             </div>
+
+                            <div className="flex items-center justify-between">
+                                <Label htmlFor="ChangeTheme">Notification Sound</Label>
+                                <ToggleSounmd />
+                            </div>
+
                             <div className="flex items-center justify-between">
                                 <Label htmlFor="logout">Logout</Label>
                                 <Logout />

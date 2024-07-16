@@ -179,6 +179,7 @@ export function ChatList({
         )}
 
       >
+
         <div className="flex gap-3 items-center">
           {message.senderId !== selectedUser.id && (
             <Avatar className="flex justify-center items-center">

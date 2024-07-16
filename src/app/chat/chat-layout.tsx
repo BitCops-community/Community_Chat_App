@@ -33,7 +33,7 @@ export function ChatLayout() {
         messages={messages}
         selectedUser={user!}
       />
-
+      <audio src="/alertRing.mp3" id="notiAudio" />
     </>
   );
 }

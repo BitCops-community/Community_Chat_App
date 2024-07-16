@@ -57,7 +57,7 @@ function calculateSingleMessageHeight(message: MessageType, selectedUser: UserTy
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = `
       <div class="flex gap-3 items-center">
-        ${message.senderId !== selectedUser!.id ? `
+        ${message.senderId !== (selectedUser!?.id || 14545) ? `
           <div class="flex justify-center items-center">
             <img src="${message.avatar}" alt="${message.name}" width="6" height="6" />
           </div>
@@ -67,7 +67,7 @@ function calculateSingleMessageHeight(message: MessageType, selectedUser: UserTy
           ${replaceUrlsWithLinks(message.message)}<br />
           <small>${message.createdAt}</small>
         </span>
-        ${message.senderId === selectedUser!.id ? `
+        ${message.senderId === (selectedUser!?.id || 14545) ? `
           <div class="flex justify-center items-center">
             <img src="${message.avatar}" alt="${message.name}" width="6" height="6" />
           </div>
@@ -80,7 +80,7 @@ function calculateSingleMessageHeight(message: MessageType, selectedUser: UserTy
     // Remove the temporary div from the DOM
     document.body.removeChild(tempDiv);
 
-    return height;
+    return height + 20;
 }
 
 
@@ -129,10 +129,6 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
         const url = process.env.NODE_ENV === 'production' ? 'https://community-chat-app-backend.onrender.com' : 'http://localhost:3002';
         const socket = io(url);
 
-        const audio = document.createElement('audio');
-        audio.src = '/alertRing.mp3';  // Replace with the correct path to your audio file
-        audio.id = 'message-audio';
-        document.body.appendChild(audio);
 
         // Listeners
         socket.on('connect', () => {
@@ -147,9 +143,15 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
         });
 
         socket.on('message', (newMessage: MessageType) => {
+            console.log(user);
+
+            let newMessageHeight = calculateSingleMessageHeight(newMessage, user);
+            setMessageHeights((prev) => [...prev, newMessageHeight]);
             setMessages(prevMessages => [...prevMessages, newMessage]);
-            const messageAudio = document.getElementById('message-audio') as HTMLAudioElement;
-            messageAudio.play();
+            if (alertMe) {
+                const audio = document.getElementById('notiAudio') as HTMLAudioElement;
+                if (audio) audio.play();
+            }
         });
 
         socket.on("connectedUsers", (data) => {

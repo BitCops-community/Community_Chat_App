@@ -9,6 +9,18 @@ import { displaySooner } from '@/components/showSonner'
 import { useRouter } from 'next/navigation'
 import { useAppContext } from '@/app/Context/AppContext'
 
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import ForgotPasswordDrawer from '@/components/ForgotPasswordDrawer'
+
 interface UserType {
     id: string;
     name: string;
@@ -93,12 +105,15 @@ const App: React.FC = () => {
                 if (data!.success) {
                     setToken(data!.token! || "")
                     setLoggedIn(true);
-                    setUser({
+                    let userData = {
                         id: data!.user?.id!,
                         name: data!.user?.name!,
                         avatar: data!.user?.avatar!,
                         isAdmin: data!.user?.isAdmin!,
-                    })
+                    }
+                    console.log(userData);
+
+                    setUser(userData)
                 } else {
                     console.log(data!.message);
                 }
@@ -144,6 +159,11 @@ const App: React.FC = () => {
                         <Button type="button" className="w-full" disabled={loading} onClick={handleLogin}>
                             {loading ? "Logining In ..." : "Login"}
                         </Button>
+
+                        <div className='w-full'>
+                            <ForgotPasswordDrawer />
+                        </div>
+
                         <p className="text-center text-sm flex justify-between items-center">
                             Don{"'"}t have an account? <Link href="/auth/signup" className="text-blue-500">Sign Up</Link>
                         </p>

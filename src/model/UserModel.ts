@@ -8,6 +8,11 @@ const UserSchema = new Schema(
     avatar: { type: String, required: false },
     password: { type: String, required: true },
     isAdmin: { type: Boolean, required: true, default: false },
+    lastPassowrdChanged: {
+      type: String,
+      require: false,
+      default: "",
+    },
   },
   { timestamps: true }
 );

@@ -3,6 +3,7 @@ import { Avatar, AvatarImage } from '../../components/ui/avatar'
 import UsersCount from '@/components/UsersCount'
 
 import { ModeToggle } from '@/components/theme-changer'
+import Settings from '@/components/Settings'
 
 
 export default function ChatTopbar() {
@@ -23,8 +24,8 @@ export default function ChatTopbar() {
           <UsersCount />
         </div>
       </div>
-
-      <ModeToggle />
+      <Settings />
+      {/* <ModeToggle /> */}
 
     </div>
   )

@@ -193,7 +193,7 @@ export function ChatList({
           <span className="bg-accent p-3 rounded-md max-w-xs" style={{ overflowWrap: "anywhere" }}>
             <small>{message.name}</small>
             <br />
-            <span
+            <span className="mb-3"
               dangerouslySetInnerHTML={{
                 __html: replaceUrlsWithLinks(message.message),
               }}

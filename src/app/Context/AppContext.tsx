@@ -36,6 +36,8 @@ interface AppContextTypes {
     messageHeights: number[];
     setMessageHeights: (newHeights: number[]) => void;
     replaceUrlsWithLinks: (message: string) => string;
+    alertMe: boolean
+    setAlertMe: (value: boolean) => void;
 }
 
 const AppContext = createContext<AppContextTypes | undefined>(undefined);
@@ -89,7 +91,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
     const [messages, setMessages] = useState<MessageType[]>([]);
     const [socket, setSocket] = useState<Socket | null>(null);
     const [liveUsers, setLiveUsers] = useState<number>(1)
-
+    const [alertMe, setAlertMe] = useState<boolean>(true);
     const [messageHeights, setMessageHeights] = React.useState<number[]>([]);
 
     const sendMessage = async (message: MessageType) => {
@@ -118,18 +120,26 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
         setMessages,
         messageHeights,
         setMessageHeights,
-        replaceUrlsWithLinks
+        replaceUrlsWithLinks,
+        alertMe,
+        setAlertMe
     };
 
     useEffect(() => {
         const url = process.env.NODE_ENV === 'production' ? 'https://community-chat-app-backend.onrender.com' : 'http://localhost:3002';
         const socket = io(url);
 
+        const audio = document.createElement('audio');
+        audio.src = '/alertRing.mp3';  // Replace with the correct path to your audio file
+        audio.id = 'message-audio';
+        document.body.appendChild(audio);
+
         // Listeners
         socket.on('connect', () => {
             setSocket(socket);
             console.log('Connected to socket server');
             displaySooner("Connected to socket server");
+
         });
 
         socket.on('disconnect', () => {
@@ -138,6 +148,8 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
 
         socket.on('message', (newMessage: MessageType) => {
             setMessages(prevMessages => [...prevMessages, newMessage]);
+            const messageAudio = document.getElementById('message-audio') as HTMLAudioElement;
+            messageAudio.play();
         });
 
         socket.on("connectedUsers", (data) => {

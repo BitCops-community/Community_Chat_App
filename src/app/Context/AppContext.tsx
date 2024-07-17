@@ -3,7 +3,8 @@ import { displaySooner } from "@/components/showSonner";
 import React, { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
 import { Socket, io } from "socket.io-client"
-
+import { disableReactDevTools } from "@fvilers/disable-react-devtools"
+disableReactDevTools();
 export interface UserType {
     id: string;
     name: string;

@@ -1,9 +1,11 @@
+
 import type { Metadata } from "next";
 import { GeistSans } from 'geist/font/sans';
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/sonner"
 import { ContextProvider } from "./Context/AppContext";
+
 export const metadata: Metadata = {
   title: "Bitcops Community: Connect, Chat & Discuss Ethical Hacking",
   description: "Join the Bitcops Community, a platform for ethical hackers to connect, chat, and discuss all things related to ethical hacking. Share knowledge, find collaborators, and stay ahead of the curve",
@@ -28,11 +30,13 @@ export const viewport = {
   userScalable: 1,
 }
 
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body className={GeistSans.className}>

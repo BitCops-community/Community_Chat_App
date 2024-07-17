@@ -2,7 +2,7 @@ import { FileImage, Paperclip, SendHorizontal, ThumbsUp } from "lucide-react";
 import { MessageType, useAppContext } from "@/app/Context/AppContext";
 import Link from "next/link";
 import React, { useRef, useState, useEffect } from "react";
-import { buttonVariants } from "../../components/ui/button";
+import { Button, buttonVariants } from "../../components/ui/button";
 import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { Textarea } from "../../components/ui/textarea";
@@ -10,6 +10,7 @@ import { EmojiPicker } from "../../components/emoji-picker";
 import { displaySooner } from "@/components/showSonner";
 import xss from "xss"
 import filterBadWords from "@/components/FilterBadWords";
+
 
 interface ChatBottombarProps {
   sendMessage: (newMessage: MessageType) => void;
@@ -114,9 +115,32 @@ export default function ChatBottombar({ sendMessage }: ChatBottombarProps) {
     }
   };
 
+
+
+  const [file, setFile] = useState<File | undefined>()
+
+  const setFileData = (e: React.ChangeEvent<HTMLInputElement> | null) => {
+    if (e?.target?.files && e.target.files.length > 0) {
+      setFile(e.target.files[0])
+
+    }
+  }
+
   return (
     <div className="p-2 flex justify-between w-full items-center gap-2">
       <AnimatePresence initial={false}>
+        {/* {user?.isAdmin && (
+          <>
+            <div className="cursor-pointer">
+              <Button className="p-1 cursor-pointer" variant={"outline"}>
+                <Label htmlFor="imageInput" className="cursor-pointer">
+                  <FileImage />
+                </Label>
+                <input id="imageInput" onChange={setFileData} type="file" className="opacity-1 right-0 absolute top-3" />
+              </Button>
+            </div>
+          </>
+        )} */}
         <motion.div
           key="input"
           className="w-full relative"
@@ -140,7 +164,7 @@ export default function ChatBottombar({ sendMessage }: ChatBottombarProps) {
             onChange={handleInputChange}
             name="message"
             placeholder="Aa"
-            className=" w-full border rounded-full flex items-center h-9 resize-none overflow-hidden bg-background"
+            className=" w-full pr-[25px] border rounded-full flex items-center h-9 resize-none overflow-hidden bg-background"
             disabled={isButtonDisabled}
           ></Textarea>
           <div className="absolute right-2 bottom-0.5">

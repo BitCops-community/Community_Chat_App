@@ -8,6 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Textarea } from "../../components/ui/textarea";
 import { EmojiPicker } from "../../components/emoji-picker";
 import { displaySooner } from "@/components/showSonner";
+import xss from "xss"
 
 interface ChatBottombarProps {
   sendMessage: (newMessage: MessageType) => void;
@@ -49,6 +50,13 @@ export default function ChatBottombar({ sendMessage }: ChatBottombarProps) {
   };
 
   const handleThumbsUp = () => {
+    let message1 = message.trim()
+    if (urlRegex.test(message1)) {
+      if (!user?.isAdmin) {
+        displaySooner("Your message contains a URL, which is not allowed.");
+        return;
+      }
+    }
     const newMessage: MessageType = {
       id: messages.length + 1,
       senderId: user!.id.toString(),
@@ -66,10 +74,12 @@ export default function ChatBottombar({ sendMessage }: ChatBottombarProps) {
   const handleSend = () => {
     if (message.trim()) {
 
-
-      if (urlRegex.test(message.trim()) && !user?.isAdmin) {
-        displaySooner("Your message contains a URL, which is not allowed.");
-        return;
+      let message1 = xss(message.trim())
+      if (urlRegex.test(message1)) {
+        if (!user?.isAdmin) {
+          displaySooner("Your message contains a URL, which is not allowed.");
+          return;
+        }
       }
 
       const newMessage: MessageType = {
@@ -77,7 +87,7 @@ export default function ChatBottombar({ sendMessage }: ChatBottombarProps) {
         senderId: user!.id.toString(),
         name: user!.name,
         avatar: user!.avatar,
-        message: message.trim(),
+        message: xss(message.trim()),
         createdAt: Date.now().toString(),
       };
 

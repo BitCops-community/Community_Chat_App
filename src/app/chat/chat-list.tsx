@@ -184,6 +184,7 @@ export function ChatList({
           {message.senderId !== selectedUser.id && (
             <Avatar className="flex justify-center items-center">
               <AvatarImage
+
                 src={message.avatar}
                 alt={message.name}
                 width={6}

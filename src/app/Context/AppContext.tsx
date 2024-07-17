@@ -38,6 +38,7 @@ interface AppContextTypes {
     replaceUrlsWithLinks: (message: string) => string;
     alertMe: boolean
     setAlertMe: (value: boolean) => void;
+    formatTimestampToHumanReadable: (date: string | number | undefined) => string
 }
 
 const AppContext = createContext<AppContextTypes | undefined>(undefined);
@@ -82,6 +83,44 @@ function calculateSingleMessageHeight(message: MessageType, selectedUser: UserTy
 
     return height + 20;
 }
+function formatTimestampToHumanReadable(timestamp: string | number | undefined): string {
+    if (!timestamp) {
+        return "Invalid date";
+    }
+
+    let date: Date;
+
+    // Check if the timestamp is a number or a string representation of a number
+    if (typeof timestamp === "number" || !isNaN(Number(timestamp))) {
+        date = new Date(Number(timestamp));
+    } else if (typeof timestamp === "string") {
+        date = new Date(timestamp);
+    } else {
+        return "Invalid date";
+    }
+
+    // Check if the date is valid
+    if (isNaN(date.getTime())) {
+        return "Invalid date";
+    }
+
+    // Define options for formatting the date
+    const options: Intl.DateTimeFormatOptions = {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        hour12: true, // Use 12-hour time format
+        timeZoneName: 'short', // Include the time zone abbreviation
+    };
+
+    // Format the date using the specified options
+    const formattedDate = date.toLocaleDateString('en-US', options);
+
+    return formattedDate;
+}
 
 
 export const ContextProvider = ({ children }: { children: ReactNode }) => {
@@ -122,7 +161,8 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
         setMessageHeights,
         replaceUrlsWithLinks,
         alertMe,
-        setAlertMe
+        setAlertMe,
+        formatTimestampToHumanReadable
     };
 
     useEffect(() => {
@@ -148,10 +188,7 @@ export const ContextProvider = ({ children }: { children: ReactNode }) => {
             let newMessageHeight = calculateSingleMessageHeight(newMessage, user);
             setMessageHeights((prev) => [...prev, newMessageHeight]);
             setMessages(prevMessages => [...prevMessages, newMessage]);
-            if (alertMe) {
-                const audio = document.getElementById('notiAudio') as HTMLAudioElement;
-                if (audio) audio.play();
-            }
+
         });
 
         socket.on("connectedUsers", (data) => {

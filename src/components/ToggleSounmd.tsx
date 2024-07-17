@@ -1,12 +1,21 @@
 "use client"
-import React from 'react'
-import { Label } from "@/components/ui/label"
+import React, { useEffect } from 'react'
 import { Switch } from "@/components/ui/switch"
 import { useAppContext } from '@/app/Context/AppContext'
+import useAudioControl from './useAudioControl'
 
 export default function ToggleSounmd() {
 
     const { alertMe, setAlertMe } = useAppContext()
+    const { mute, unmute } = useAudioControl();
+
+    useEffect(() => {
+        if (alertMe) {
+            unmute();
+        } else {
+            mute();
+        }
+    }, [mute, unmute, alertMe])
 
     return (
         <div className="flex items-center space-x-2">

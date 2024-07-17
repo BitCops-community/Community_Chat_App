@@ -1,10 +1,13 @@
 import { cn } from "@/lib/utils";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Avatar, AvatarImage } from "../../components/ui/avatar";
 import ChatBottombar from "./chat-bottombar";
 import { motion } from "framer-motion";
 import { MessageType, useAppContext, UserType } from "@/app/Context/AppContext";
 import { AutoSizer, List } from "react-virtualized";
+import xss from "xss";
+import { displaySooner } from "@/components/showSonner";
+import UserProfile from "@/components/UserProfile";
 
 interface ChatListProps {
   messages?: MessageType[];
@@ -12,44 +15,6 @@ interface ChatListProps {
   sendMessage: (newMessage: MessageType) => void;
 }
 
-function formatTimestampToHumanReadable(timestamp: string | number | undefined): string {
-  if (!timestamp) {
-    return "Invalid date";
-  }
-
-  let date: Date;
-
-  // Check if the timestamp is a number or a string representation of a number
-  if (typeof timestamp === "number" || !isNaN(Number(timestamp))) {
-    date = new Date(Number(timestamp));
-  } else if (typeof timestamp === "string") {
-    date = new Date(timestamp);
-  } else {
-    return "Invalid date";
-  }
-
-  // Check if the date is valid
-  if (isNaN(date.getTime())) {
-    return "Invalid date";
-  }
-
-  // Define options for formatting the date
-  const options: Intl.DateTimeFormatOptions = {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    second: 'numeric',
-    hour12: true, // Use 12-hour time format
-    timeZoneName: 'short', // Include the time zone abbreviation
-  };
-
-  // Format the date using the specified options
-  const formattedDate = date.toLocaleDateString('en-US', options);
-
-  return formattedDate;
-}
 
 
 
@@ -59,8 +24,11 @@ export function ChatList({
   sendMessage
 }: ChatListProps) {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
-  const { token, loggedIn, setMessages, messageHeights, setMessageHeights, replaceUrlsWithLinks } = useAppContext();
-
+  const { alertMe, token, loggedIn, setMessages, messageHeights, setMessageHeights, replaceUrlsWithLinks, formatTimestampToHumanReadable } = useAppContext();
+  const [showProfile, setShowProfile] = useState<{ open: boolean; id: string }>({
+    open: false,
+    id: ""
+  });
 
   const listRef = useRef<List>(null); // Ref to the List component
   React.useEffect(() => {
@@ -76,7 +44,16 @@ export function ChatList({
       messagesContainerRef.current.scrollTop =
         messagesContainerRef.current.scrollHeight;
     }
-  }, [messages]);
+    if (alertMe) {
+      if (messages![messages?.length! - 1]?.senderId === selectedUser?.id) {
+
+      } else {
+
+        const audio = document.getElementById('notiAudio') as HTMLAudioElement;
+        if (audio) audio.play();
+      }
+    }
+  }, [alertMe, messages, selectedUser?.id]);
 
   const getMessages = async () => {
     const req = await fetch("/api/v1/messages/get", {
@@ -144,9 +121,13 @@ export function ChatList({
   useEffect(() => {
     if (messages) {
       const heights = calculateMessageHeights(messages);
-
-
       setMessageHeights(heights);
+      setTimeout(() => {
+        if (listRef.current) {
+          // Scroll to the bottom when messages change
+          listRef.current.scrollToRow(messages?.length! - 1)
+        }
+      }, 2000);
     }
   }, [messages]);
 
@@ -182,9 +163,11 @@ export function ChatList({
 
         <div className="flex gap-3 items-center">
           {message.senderId !== selectedUser.id && (
-            <Avatar className="flex justify-center items-center">
-              <AvatarImage
-
+            <Avatar className="flex cursor-pointer justify-center items-center">
+              <AvatarImage className="cursor-pointer"
+                style={{ cursor: "pointer" }}
+                title={message?.name}
+                onClick={() => setShowProfile((prev) => ({ ...prev, open: true, id: message.senderId }))}
                 src={message.avatar}
                 alt={message.name}
                 width={6}
@@ -197,7 +180,7 @@ export function ChatList({
             <br />
             <span className="mb-3"
               dangerouslySetInnerHTML={{
-                __html: replaceUrlsWithLinks(message.message),
+                __html: replaceUrlsWithLinks(xss(message.message)),
               }}
             />
             <br />
@@ -209,6 +192,7 @@ export function ChatList({
               <AvatarImage
                 src={message.avatar}
                 alt={message.name}
+                onClick={() => setShowProfile((prev) => ({ ...prev, open: true, id: message.senderId }))}
                 width={6}
                 height={6}
               />
@@ -223,8 +207,9 @@ export function ChatList({
     return null;
   }
 
+
   return (
-    <div ref={messagesContainerRef} className="w-full top-header overflow-y-auto overflow-x-hidden h-full flex flex-col">
+    <div ref={messagesContainerRef} className="w-full top-header overflow-y-auto overflow-x-hidden h-[95%] flex flex-col">
       <AutoSizer disableHeight>
         {({ width }) => (
           <List
@@ -238,6 +223,7 @@ export function ChatList({
           />
         )}
       </AutoSizer>
+      <UserProfile setShowProfile={setShowProfile} showProfile={showProfile} />
       <ChatBottombar sendMessage={sendMessage} />
     </div>
   );

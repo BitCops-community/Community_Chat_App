@@ -9,6 +9,7 @@ import { Textarea } from "../../components/ui/textarea";
 import { EmojiPicker } from "../../components/emoji-picker";
 import { displaySooner } from "@/components/showSonner";
 import xss from "xss"
+import filterBadWords from "@/components/FilterBadWords";
 
 interface ChatBottombarProps {
   sendMessage: (newMessage: MessageType) => void;
@@ -81,13 +82,13 @@ export default function ChatBottombar({ sendMessage }: ChatBottombarProps) {
           return;
         }
       }
-
+      message1 = filterBadWords(message1)
       const newMessage: MessageType = {
         id: message.length + 1,
         senderId: user!.id.toString(),
         name: user!.name,
         avatar: user!.avatar,
-        message: xss(message.trim()),
+        message: message1,
         createdAt: Date.now().toString(),
       };
 

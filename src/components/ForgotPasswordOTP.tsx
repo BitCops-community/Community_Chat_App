@@ -35,7 +35,7 @@ const ForgotPasswordOTP: React.FC<ForgotPasswordOTPProps> = ({ email, token, set
                 const res = await req.json();
                 if (res.success) {
                     displaySooner(res.message)
-                    setFinalToken(res?.newToken);
+                    setFinalToken(res?.token);
                     setIsVerified(true)
                 } else {
                     displaySooner(res.message)

@@ -9,7 +9,7 @@ secure: true, // use SSL
     pass: process.env.NODEMAILER_PASSWORD!,
   },
 });
-transporter.verify(function (error:error, success:any) {
+transporter.verify(function (error:any, success:any) {
   if (error) {
     console.log(error);
   } else {

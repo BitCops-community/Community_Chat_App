@@ -1,9 +1,16 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false, // Use `true` for port 465, `false` for all other ports
+  host: "smtp.titan.email",
+  port: 465,
+  secure: true,
+  secureConnection: false,
+  tls: {
+   ciphers: "SSLv3",
+},
+requireTLS: true,
+debug: true,
+connectionTimeout: 10000,
   auth: {
     user: process.env.NODEMAILER_USER!,
     pass: process.env.NODEMAILER_PASSWORD!,

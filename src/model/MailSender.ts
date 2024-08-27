@@ -3,11 +3,8 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: "smpt.hostinger.com",
   port: 465,
-  secure: true,
+  secure: false,
   secureConnection: false,
-  tls: {
-   ciphers: "SSLv3",
-},
 requireTLS: true,
 debug: true,
 connectionTimeout: 10000,

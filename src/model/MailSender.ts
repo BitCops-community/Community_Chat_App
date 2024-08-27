@@ -1,9 +1,9 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "smtp.titan.email",
-  port: 587,
-secure: false, // use SSL
+  host: "smtp.hostinger.com",
+  port: 465,
+  secure: true, // Use `true` for port 465, `false` for all other ports
   auth: {
     user: process.env.NODEMAILER_USER!,
     pass: process.env.NODEMAILER_PASSWORD!,
@@ -17,7 +17,6 @@ transporter.verify(function (error:any, success:any) {
   }
 });
 async function main(receiverEmail: string, verificationLink: string) {
-  console.log(`Sending Verification Email : ${receiverEmail}`);
   const htmlContent = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #dddddd; border-radius: 10px;">
       <h2 style="color: #333333;">Verify Your Email Address</h2>
@@ -38,13 +37,13 @@ async function main(receiverEmail: string, verificationLink: string) {
   `;
 
   const info = await transporter.sendMail({
-    from: '"Bitcops Community" <no-reply@bitcops.community.com>', // sender address
+    from: `${process.env.NODEMAILER_USER!}`, // sender address
     to: receiverEmail, // list of receivers
     subject: "Please Verify Your Email Address", // Subject line
     text: `Please click the following link to verify your email address: ${verificationLink}`, // plain text body
     html: htmlContent, // html body
   });
-  
+
   console.log("Message sent: %s", info.messageId);
 }
 

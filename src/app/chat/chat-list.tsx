@@ -211,7 +211,7 @@ export function ChatList({
         <h3>No Messages Yet</h3>
         <p>Start the conversation by sending a message!</p>
       </div>
-      <ChatBottombar />
+      <ChatBottombar sendMessage={sendMessage} />
     </>
   );
 }

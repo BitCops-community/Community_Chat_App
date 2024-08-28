@@ -8,7 +8,7 @@ import { AutoSizer, List } from "react-virtualized";
 import xss from "xss";
 import { displaySooner } from "@/components/showSonner";
 import UserProfile from "@/components/UserProfile";
-
+import { EnvelopeOpenIcon } from "@radix-ui/react-icons";
 interface ChatListProps {
   messages?: MessageType[];
   selectedUser: UserType;
@@ -203,10 +203,18 @@ export function ChatList({
     );
   };
 
-  if (messageHeights.length === 0) {
-    return null;
+  if (messages.length === 0) {
+    return (
+      <>
+        <div className="h-full text-center flex-col flex items-center justify-center">
+          <EnvelopeOpenIcon />
+          <h3>No Messages Yet</h3>
+          <p>Start the conversation by sending a message!</p>
+        </div>
+        <ChatBottombar />
+      </>
+    )
   }
-
 
   return (
     <div ref={messagesContainerRef} className="w-full top-header overflow-y-auto overflow-x-hidden h-[95%] flex flex-col">

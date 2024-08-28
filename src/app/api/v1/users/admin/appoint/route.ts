@@ -49,48 +49,20 @@ const handler = async (req: NextRequest) => {
       });
     }
 
-    let newUser = await User.findById(userId);
+  let newUser = await User.findById(userId);
     if (!newUser) {
       return NextResponse.json({
         success: false,
         message: "Invalid Request Invalid User!",
       });
     }
-    if (
-      newUser.username === "faisal_ranjha" ||
-      newUser.email === "faisalshahzadyt@gmail.com" ||
-      newUser.email === "ranjhaplaysyt@gmail.com"
-    ) {
-      return NextResponse.json({
-        success: false,
-        message: "You Cannot Remove this user From Admin Role",
-      });
-    }
-    // Check if the newUser is an admin that should be protected
-    if (
-      newUser.email === process.env?.ADMIN_EMAIL ||
-      newUser.username === process.env?.ADMIN_USERNAME
-    ) {
-      // Ensure only authorized users can remove the admin role
-      if (
-        currentUser.email !== "faisalshahzadyt@gmail.com" &&
-        currentUser.email !== "ranjhaplaysyt@gmail.com"
-      ) {
-        return NextResponse.json({
-          success: false,
-          message:
-            "You are not authorized to remove this user from the admin role",
-        });
-      }
-    }
 
-    // If authorized, proceed to remove the admin role
-    newUser.isAdmin = false;
+    newUser.isAdmin = true;
     await newUser.save();
 
     return NextResponse.json({
       success: true,
-      message: `Mr ${newUser?.name} Removed From Admin Role`,
+      message: `Mr ${newUser?.name} Appointed As Admin`,
     });
   } catch (error) {
     console.log(error);

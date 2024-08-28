@@ -8,7 +8,7 @@ import { AutoSizer, List } from "react-virtualized";
 import xss from "xss";
 import { displaySooner } from "@/components/showSonner";
 import UserProfile from "@/components/UserProfile";
-import { EnvelopeOpenIcon } from "@radix-ui/react-icons";
+
 interface ChatListProps {
   messages?: MessageType[];
   selectedUser: UserType;
@@ -202,7 +202,9 @@ export function ChatList({
       </motion.div>
     );
   };
-
+  if (messageHeights.length === 0) {
+    return null;
+  }
   return (
     <div ref={messagesContainerRef} className="w-full top-header overflow-y-auto overflow-x-hidden h-[95%] flex flex-col">
       <AutoSizer disableHeight>

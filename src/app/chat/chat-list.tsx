@@ -203,18 +203,19 @@ export function ChatList({
     );
   };
 
-  if (messages.length === 0) {
-    return (
-      <>
-        <div className="h-full text-center flex-col flex items-center justify-center">
-          <EnvelopeOpenIcon />
-          <h3>No Messages Yet</h3>
-          <p>Start the conversation by sending a message!</p>
-        </div>
-        <ChatBottombar />
-      </>
-    )
-  }
+  if ((messages ?? []).length === 0) {
+  return (
+    <>
+      <div className="h-full text-center flex-col flex items-center justify-center">
+        <EnvelopeOpenIcon />
+        <h3>No Messages Yet</h3>
+        <p>Start the conversation by sending a message!</p>
+      </div>
+      <ChatBottombar />
+    </>
+  );
+}
+
 
   return (
     <div ref={messagesContainerRef} className="w-full top-header overflow-y-auto overflow-x-hidden h-[95%] flex flex-col">

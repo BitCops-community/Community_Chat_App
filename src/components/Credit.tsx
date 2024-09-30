@@ -47,8 +47,8 @@ export default function Credit() {
             </PopoverTrigger>
             <PopoverContent asChild>
               <div className="flex items-center justify-evenly">
-                <a target="_blank" href="https://github.com/fhackker">
-                  <Github className="cursor-pointer" color="#4169E1" />
+                <a target="_blank" href="https://www.youtube.com/@Bitcops">
+                  <Youtube className="cursor-pointer" color="#4169E1" />
                 </a>
 
                 <a href="#">
